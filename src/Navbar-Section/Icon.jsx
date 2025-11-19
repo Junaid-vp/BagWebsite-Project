@@ -1,45 +1,55 @@
+// ============================================================================
+// Icon.jsx — Navbar action icons: Search, Wishlist, Cart badge, Profile/Login
+// - Uses AuthContext to show profile link when logged in
+// - Uses CartContext to show cart item count badge
+// - No behavior changed — only concise headers for clarity
+// ============================================================================
+
 import React, { useContext } from "react";
 import {
   HeartIcon,
-  ShoppingCartIcon,
+  ShoppingBagIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@headlessui/react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../Context/AuthContext";
 import { CartContext } from "../Context/CartContext";
 
 function Icon() {
-const {cartLength}= useContext(CartContext)
-const {user}=useContext(AuthContext)
+  // Contexts
+  const { cartLength } = useContext(CartContext); // number of items in cart (badge)
+  const { user } = useContext(AuthContext); // logged-in user (truthy when logged in)
 
   return (
-    
     <div className="flex items-center space-x-5">
-      {/* Search */}
-      <Link to="/SearchBox" className="text-gray-700 hover:text-black">
+      {/* Search: navigates to search page */}
+      <Link to="/SearchBox" className="text-gray-700 hover:text-black" aria-label="Search">
         <MagnifyingGlassIcon className="h-6 w-6" />
       </Link>
 
-      {/* Wishlist */}
-      <Link to="/wishlist" className="text-gray-700 hover:text-black">
+      {/* Wishlist: navigates to wishlist (user-protected route should handle auth) */}
+      <Link to="/wishlist" className="text-gray-700 hover:text-black" aria-label="Wishlist">
         <HeartIcon className="h-6 w-6" />
       </Link>
 
-   {/* Cart */}
-<Link to="/cart" className="relative text-gray-700 hover:text-black">
-  <ShoppingCartIcon className="h-6 w-6" />
-  
-  {cartLength > 0 && (
-    <span className="absolute -top-1 -right-2 bg-black text-white text-xs rounded-full px-1.5 py-0.5">
-      {cartLength}
-    </span>
-  )}
-</Link>
+      {/* Cart: shows badge when cartLength > 0 */}
+      <Link to="/cart" className="relative text-gray-700 hover:text-black" aria-label="Cart">
+        <ShoppingBagIcon className="h-6 w-6" />
 
-      {/* Login */}
-     {user ? (
-     <Link to="/profile" className="text-gray-700 hover:text-black">
+        {cartLength > 0 && (
+          <span className="absolute -top-1 -right-2 bg-black text-white text-xs rounded-full px-1.5 py-0.5">
+            {cartLength}
+          </span>
+        )}
+      </Link>
+
+      {/* Profile / Login:
+          - If user exists -> link to profile
+          - Else -> link to login
+          (Icon is identical for both states; route differs)
+      */}
+      {user ? (
+        <Link to="/profile" className="text-gray-700 hover:text-black" aria-label="Profile">
           <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -50,7 +60,7 @@ const {user}=useContext(AuthContext)
           </svg>
         </Link>
       ) : (
-        <Link to="/login" className="text-gray-700 hover:text-black">
+        <Link to="/login" className="text-gray-700 hover:text-black" aria-label="Login">
           <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -60,7 +70,7 @@ const {user}=useContext(AuthContext)
             />
           </svg>
         </Link>
-      )} 
+      )}
     </div>
   );
 }

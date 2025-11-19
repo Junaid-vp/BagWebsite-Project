@@ -1,40 +1,61 @@
-import React, { createContext, useEffect, useState } from "react";
+// ============================================================================
+// CartContext.jsx — Cart provider (fetch, add, remove, qty updates, clear cart)
+// - Uses AuthContext for current user
+// - Persists cart to server via `api.patch`
+// - Shows toasts for user feedback
+// ============================================================================
+
+import React, { createContext, useEffect, useState, useContext } from "react";
 import { api } from "../Api/Axios";
 import { toast } from "react-toastify";
-import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
+
 export const CartContext = createContext();
 
 function CartProvider({ children }) {
-//   const [user, setUser] = useState(null);
+  // ------------------------------------------------------------------------
+  // State: cart items + cart length (for badges)
+  // ------------------------------------------------------------------------
   const [cart, setCart] = useState([]);
-  const [cartLength,setCartLength] = useState(0)
-//   const [isLogin, setIsLogin] = useState(true)
- const {user,setUser}=useContext(AuthContext)
-  // ✅ Get logged user and fetch cart
-  useEffect(() => {
-    // const storedUser = JSON.parse(localStorage.getItem("loginData"));
-    if (user) {
-    //   setUser(storedUser);
-      fetchCart(user?.id);
-    }
-  }, [user]);
+  const [cartLength, setCartLength] = useState(0);
 
-  // ✅ Fetch cart from server
+  // ------------------------------------------------------------------------
+  // Auth: current user (used for server requests)
+  // ------------------------------------------------------------------------
+  const { user, setUser } = useContext(AuthContext);
+
+  // ------------------------------------------------------------------------
+  // fetchCart(userId)
+  // - Loads user's cart from server and updates local state
+  // ------------------------------------------------------------------------
   const fetchCart = async (userId) => {
     try {
-      const res = await api.get(`/users/${userId}`);
-      setCart(res.data.cart || []);
-      setCartLength(res.data.cart.length)
+      if (user.role !== "admin") {
+        const res = await api.get(`/users/${userId}`);
+        setCart(res.data.cart || []);
+        setCartLength(res.data.cart.length);
+      } else {
+        setCart([]);
+        setCartLength(0);
+      }
     } catch (error) {
       console.log("❌ CART FETCH ERROR:", error);
       toast.error("Failed to load cart");
     }
   };
 
+  // Sync cart when user changes (login/logout)
+  useEffect(() => {
+    if (user) {
+      fetchCart(user?.id);
+    }
+  }, [user]);
 
-
-  // ✅ Add product to cart
+  // ------------------------------------------------------------------------
+  // addCart(product)
+  // - Adds product or increases quantity
+  // - Updates server and shows toast feedback
+  // ------------------------------------------------------------------------
   const addCart = async (product) => {
     if (!user) {
       toast.error("Please login to add items");
@@ -42,60 +63,90 @@ function CartProvider({ children }) {
     }
 
     const exists = cart.find((item) => item.product_id === product.product_id);
-
     let updated;
+
     if (exists) {
       updated = cart.map((item) =>
         item.product_id === product.product_id
           ? { ...item, Quantity: item.Quantity + 1 }
           : item
       );
-
       toast.info("Quantity increased");
     } else {
       updated = [...cart, { ...product, Quantity: 1 }];
-      toast.success("Item added to cart 🛒");
+      toast.success(
+        <div className="toast-content">
+          <span className="toast-title">{product.name}</span>
+          <span className="toast-subtitle">Added to Cart</span>
+        </div>,
+        {
+          icon: "✅",
+          className: "custom-toast",
+        }
+      );
     }
 
     setCart(updated);
 
     try {
-    const updated_cart = await api.patch(`/users/${user.id}`, { cart: updated });
-
-    setCartLength(updated_cart.data.cart.length)
-    console.log(updated_cart)
-    
+      const updated_cart = await api.patch(`/users/${user.id}`, {
+        cart: updated,
+      });
+      setCartLength(updated_cart.data.cart.length);
     } catch (error) {
       console.log("❌ CART ADD/PATCH ERROR:", error);
       toast.error("Could not update cart on server");
     }
   };
 
-  // ✅ Remove item completely
-  const removeCart = async (productId) => {
-    const updated = cart.filter((item) => item.product_id !== productId);
+  // ------------------------------------------------------------------------
+  // removeCart(product)
+  // - Removes product from cart, updates server and shows toast
+  // ------------------------------------------------------------------------
+  const removeCart = async (product) => {
+    const updated = cart.filter(
+      (item) => item.product_id !== product.product_id
+    );
     setCart(updated);
-    toast.error("Item removed from cart");
+
+    toast.success(
+      <div className="toast-content">
+        <span className="toast-title">{product.name}</span>
+        <span className="toast-subtitle">Remove From Cart</span>
+      </div>,
+      {
+        icon: "✅",
+        className: "custom-toast",
+      }
+    );
 
     try {
-   const updated_cart = await api.patch(`/users/${user.id}`, { cart: updated });
-       setCartLength(updated_cart.data.cart.length)
+      const updated_cart = await api.patch(`/users/${user.id}`, {
+        cart: updated,
+      });
+      setCartLength(updated_cart.data.cart.length);
     } catch (error) {
       console.log("❌ CART REMOVE ERROR:", error);
       toast.error("Could not remove item from server");
     }
   };
 
-  // ✅ Increase quantity (+1)
+  // ------------------------------------------------------------------------
+  // addQuantity(productId)
+  // - Increase Quantity up to a ceiling (10)
+  // - Persist to server
+  // ------------------------------------------------------------------------
   const addQuantity = async (productId) => {
     const updated = cart.map((item) =>
       item.product_id === productId
-        ? { ...item, Quantity: item.Quantity <10? item.Quantity+1:item.Quantity }
+        ? {
+            ...item,
+            Quantity: item.Quantity < 10 ? item.Quantity + 1 : item.Quantity,
+          }
         : item
     );
 
     setCart(updated);
-   
 
     try {
       await api.patch(`/users/${user.id}`, { cart: updated });
@@ -105,18 +156,22 @@ function CartProvider({ children }) {
     }
   };
 
-  // ✅ Decrease quantity (not less than 1)
-const lessQuantity = async (productId) => {
- 
-
- const updated = cart.map((item) =>
+  // ------------------------------------------------------------------------
+  // lessQuantity(productId)
+  // - Decrease Quantity (not below 1)
+  // - Persist to server
+  // ------------------------------------------------------------------------
+  const lessQuantity = async (productId) => {
+    const updated = cart.map((item) =>
       item.product_id === productId
-        ? { ...item, Quantity: item.Quantity >1? item.Quantity-1:item.Quantity }
+        ? {
+            ...item,
+            Quantity: item.Quantity > 1 ? item.Quantity - 1 : item.Quantity,
+          }
         : item
     );
 
     setCart(updated);
-    
 
     try {
       await api.patch(`/users/${user.id}`, { cart: updated });
@@ -126,6 +181,25 @@ const lessQuantity = async (productId) => {
     }
   };
 
+  // ------------------------------------------------------------------------
+  // HandleClearCart(userId)
+  // - Clears server cart and local state
+  // ------------------------------------------------------------------------
+  const HandleClearCart = async (userId) => {
+    try {
+      await api.patch(`/users/${userId}`, { cart: [] });
+      setCart([]);
+      setCartLength(0);
+      toast.success("Cart cleared successfully");
+    } catch (error) {
+      console.log("❌ SOMETHING ERROR :", error);
+      toast.error("Failed to clear cart");
+    }
+  };
+
+  // ------------------------------------------------------------------------
+  // Provider value (exposed API for consumers)
+  // ------------------------------------------------------------------------
   return (
     <CartContext.Provider
       value={{
@@ -135,7 +209,9 @@ const lessQuantity = async (productId) => {
         addQuantity,
         lessQuantity,
         fetchCart,
-        cartLength
+        cartLength,
+        setCart,
+        HandleClearCart,
       }}
     >
       {children}

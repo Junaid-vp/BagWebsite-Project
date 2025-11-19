@@ -1,6 +1,55 @@
 @import "tailwindcss";
 @import 'keen-slider/keen-slider.min.css';
 
+
+/* ✅ Add this BELOW the tailwind imports */
+
+
+/* ✅ Custom toast main container */
+.custom-toast {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  font-family: "Inter", sans-serif;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ✅ Content layout inside toast */
+.toast-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ Product name (title) */
+.toast-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000000;
+}
+
+/* ✅ Subtitle / message */
+.toast-subtitle {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+
 /* body{
     background-color: black;
 } */
+
+
+
+.premium-toast {
+  font-size: 12px;         /* smaller text */
+  font-weight: 300;        /* sleek weight */
+  font-family: 'Inter', sans-serif;
+  background: #ffffff !important;   /* white & clean */
+  color: #111 !important;           /* dark text */
+  border: 1px solid #e5e7eb;        /* subtle border */
+  border-radius: 10px;              /* soft corners */
+  padding: 10px 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* premium subtle shadow */
+}

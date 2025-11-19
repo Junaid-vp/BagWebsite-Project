@@ -1,10 +1,12 @@
-import React from "react";
+import React , { useEffect }from "react";
 import useFetch from "../../Hooks/UseFetch";
 import { Link } from "react-router-dom";
 import ProductCard from "../../Reusable Components/ProductCart";
 function MainAllBags() {
   const { datas } = useFetch("/products");
-
+ useEffect(() => {
+    window.scrollTo(0, 0); 
+  }, []);
   return (
     <div className="bg-white" data-aos="fade-up"
      data-aos-duration="3000">
@@ -23,7 +25,7 @@ function MainAllBags() {
               <Link to="/" className="hover:underline">
                 Home
               </Link>{" "}
-              / <Link className="hover:underline" to="/MainAllBag" >Bestsellers</Link>
+               <Link className="hover:underline" to="/MainAllBag" >Bestsellers</Link>
             </h6>
 
             <h3 className="text-3xl font-bold text-gray-900 mb-4 mt-10">

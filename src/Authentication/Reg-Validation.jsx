@@ -10,9 +10,7 @@ export const RegValidation = Yup.object({
   email: Yup.string().email("Invalid Email").required("Email is required"),
   password: Yup.string()
     .min(6, "Password must be minimum 6 characters")
-    // .matches(
-    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-    //   "Password must include uppercase, lowercase, number and special character"
-    // )
+  .matches(/^(?=.*\d).{6,}$/, "Password must be at least 6 characters and include a number")
+
     .required("Password is required"),
 });

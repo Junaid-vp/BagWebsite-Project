@@ -33,11 +33,47 @@ function Login() {
       // console.log("afafa", userData)
       // fetchCart(userData?.id)
       if (isExist) {
-        toast.success("✨ You're in! Welcome aboard.");
+  
         // localStorage.setItem("loginData", JSON.stringify(isExist));
-        Login(isExist)
+        if(isExist.role ==="admin"){
+          navigate("/dashboard")
+          Login(isExist)
+                 toast.success(`You're in! Welcome ${isExist.name} `, {
+    position: "top-right",
+    autoClose: 1800,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: false,
+    className: "premium-toast",
+  });
+        }else {
+        if(isExist.isBlock===true){
+                    toast.warning(`${isExist.FirstName} ${isExist.LastName} Your Account is Blocked`, {
+    position: "top-right",
+    autoClose: 1800,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: false,
+    className: "premium-toast",
+  });
+          return
+        }else{Login(isExist)
         resetForm();
        navigate("/")
+      
+              toast.success(`You're in! Welcome ${isExist.FirstName} ${isExist.LastName}`, {
+    position: "top-right",
+    autoClose: 1800,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: false,
+    className: "premium-toast",
+  });
+      }
+    }
       } else {
          
         toast.error("Account not found. Please register first.");

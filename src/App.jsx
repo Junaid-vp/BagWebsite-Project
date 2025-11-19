@@ -1,32 +1,74 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+// ============================================================================
+// 📌 App.jsx — Main Application Layout Wrapper
+// This file manages Layout visibility, Context Providers, and AOS Animation Init
+// ============================================================================
+
+import { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar-Section/Navbar";
 import Footer from "./Footer-Section/Footer";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { useEffect } from "react";
+
+// =====================
+// 🌐 GLOBAL CONTEXT PROVIDERS
+// =====================
 import CartProvider from "./Context/CartContext";
 import { AuthProvider } from "./Context/AuthContext";
+import { WishListProvider } from "./Context/WIshListContext";
+import OrderProvider from "./Dashboard/Context/OrderContext";
+
+
 function App() {
+  
+  // ------------------------------------------------------------------------
+  // 📍 Detect Current Route Path for Layout Logic
+  // ------------------------------------------------------------------------
+  const location = useLocation();
+  console.log(location);
+
+  const path = (location?.pathname || "").toLowerCase();
+
+  // Hide Navbar & Footer for Dashboard Admin Panel Only
+  const hideLayout = path.startsWith("/dashboard");
+
+  
+  // ------------------------------------------------------------------------
+  // 🎞️ Initialize AOS (Scroll Animation Library)
+  // ------------------------------------------------------------------------
   useEffect(() => {
     AOS.init({
-      duration: 900, // Increase duration for smoother animation
-      easing: "ease-in-out", // Smooth easing
-      once: true, // Animation triggers only once
+      duration: 600,
+      easing: "ease-in-out",
+      once: true,
     });
   }, []);
+
+
+  // ------------------------------------------------------------------------
+  // 🧩 Application Layout Rendering Logic
+  // - All Routes Render Inside <Outlet />
+  // - Navbar & Footer are hidden only for /dashboard routes
+  // ------------------------------------------------------------------------
   return (
-    <>
+    <OrderProvider>
       <AuthProvider>
         <CartProvider>
-          <Navbar />
+          <WishListProvider>
 
-          <Outlet />
+            {/* 🔼 Show Navbar only if route is NOT Dashboard */}
+            {!hideLayout && <Navbar />}
 
-          <Footer />
+            {/* 🔀 Dynamic Route Child Rendering */}
+            <Outlet />
+
+            {/* 🔽 Show Footer only if route is NOT Dashboard */}
+            {!hideLayout && <Footer />}
+
+          </WishListProvider>
         </CartProvider>
       </AuthProvider>
-    </>
+    </OrderProvider>
   );
 }
 

@@ -22,7 +22,7 @@ function Register() {
 
   const HandleSubmit = async (
     values,
-    { setSubmitting, resetForm, setStatus }
+    { setSubmitting, resetForm,  }
   ) => {
     try {
       const Data = {
@@ -31,6 +31,11 @@ function Register() {
         Email: values.email.toLowerCase(),
         password: values.password,
         cart:[],
+        wishList:[],
+        address:[],
+        order:[],
+        isBlock:false,
+        role:"user",
         createdAt: new Date().toISOString(),
       };
 
@@ -41,14 +46,16 @@ function Register() {
         return;
       }
       const Add = await api.post("/users", Data);
-
-      toast.success("✨Account created successfully!", {
-        position: "top-center",
-        autoClose: 1800,
-        hideProgressBar: true,
-        theme: "light",
-      });
-
+ 
+       toast.success("You're all set! Registration successful.", {
+          position: "top-right",
+          autoClose: 1800,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          className: "premium-toast",
+        });
       resetForm();
       Navigate("/login");
     } catch (error) {
