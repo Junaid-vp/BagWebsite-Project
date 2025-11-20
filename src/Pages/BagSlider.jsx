@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function BagSlider() {
@@ -6,15 +6,26 @@ export default function BagSlider() {
   const [mouseX, setMouseX] = useState("50%");
   const [isDragging, setIsDragging] = useState(false);
   const navigate = useNavigate();
+  const sliderRef = useRef(null);
 
   const handleStart = useCallback((e) => {
     setIsDragging(true);
-    // Prevent default to avoid scrolling while dragging
+    
+    // Prevent default to avoid scrolling and text selection
     e.preventDefault();
+    e.stopPropagation();
+    
+    // Disable text selection during drag
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
   }, []);
 
   const handleEnd = useCallback(() => {
     setIsDragging(false);
+    
+    // Re-enable text selection
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
   }, []);
 
   const handleMove = useCallback(
@@ -22,7 +33,6 @@ export default function BagSlider() {
       if (!isDragging) return;
 
       const rect = e.currentTarget.getBoundingClientRect();
-      // Get X coordinate from either mouse or touch event
       const clientX = e.clientX || (e.touches && e.touches[0].clientX);
       if (!clientX) return;
 
@@ -36,6 +46,10 @@ export default function BagSlider() {
       } else {
         setSide("right");
       }
+
+      // Prevent scrolling when dragging
+      e.preventDefault();
+      e.stopPropagation();
     },
     [isDragging]
   );
@@ -44,20 +58,30 @@ export default function BagSlider() {
     setSide(null);
     setIsDragging(false);
     setMouseX("50%");
+    
+    // Re-enable text selection
+    document.body.style.userSelect = '';
+    document.body.style.webkitUserSelect = '';
+  }, []);
+
+  // Prevent context menu on mobile (long press)
+  const preventContextMenu = useCallback((e) => {
+    e.preventDefault();
   }, []);
 
   return (
-    <div className="w-full py-12 px-4 font-sans">
-      <div className="w-full mx-auto">
-        <div className="text-left mb-6">
-          <h2 className="text-2xl font-light text-gray-800 tracking-tight">
+    <div className="w-full py-6 md:py-12 px-4 font-sans">
+      <div className="w-full mx-auto max-w-6xl">
+        <div className="text-left mb-4 md:mb-6">
+          <h2 className="text-lg md:text-2xl font-light text-gray-800 tracking-tight">
             SLIDE TO SWITCH
           </h2>
         </div>
 
-        {/* Slider Container - Now with touch events */}
+        {/* Slider Container */}
         <div
-          className="relative w-full mx-auto h-[500px] bg-white overflow-hidden select-none cursor-ew-resize rounded-xl transition-shadow duration-300 hover:shadow-3xl touch-none"
+          ref={sliderRef}
+          className="relative w-full mx-auto h-[300px] sm:h-[400px] md:h-[500px] bg-white overflow-hidden select-none cursor-ew-resize rounded-xl transition-shadow duration-300 hover:shadow-3xl touch-none"
           onMouseDown={handleStart}
           onMouseUp={handleEnd}
           onMouseMove={handleMove}
@@ -66,6 +90,13 @@ export default function BagSlider() {
           onTouchEnd={handleEnd}
           onTouchMove={handleMove}
           onTouchCancel={handleLeave}
+          onContextMenu={preventContextMenu}
+          style={{
+            // Additional touch action prevention
+            touchAction: 'none',
+            WebkitTouchCallout: 'none',
+            WebkitTapHighlightColor: 'transparent'
+          }}
         >
           {/* RIGHT BAG IMAGE - The 'Wine' bag */}
           <div className="absolute inset-0 bg-red-800">
@@ -104,7 +135,7 @@ export default function BagSlider() {
             }}
           />
 
-          {/* LUXURY ARROW INDICATOR - ALWAYS VISIBLE */}
+          {/* LUXURY ARROW INDICATOR */}
           <div
             className="absolute z-40 pointer-events-none"
             style={{
@@ -114,33 +145,22 @@ export default function BagSlider() {
               transition: isDragging ? "none" : "left 0.5s ease-out",
             }}
           >
-            <div className="before-after__cursor" tabIndex="0">
-              <span className="sr-only">
-                Use the left and right arrow keys to navigate between before and
-                after photos.
-              </span>
-
-              {/* Luxury Arrow Design */}
+            <div className="before-after__cursor">
               <div className="relative">
-                {/* Outer Glow Effect */}
                 <div
                   className={`absolute inset-0 bg-white/30 rounded-full blur-md scale-110 transition-all duration-300 ${
                     isDragging ? "animate-pulse" : "opacity-70"
                   }`}
                 ></div>
 
-                {/* Main Circle */}
                 <svg
                   role="presentation"
                   focusable="false"
-                  width="50"
-                  height="50"
+                  className="w-10 h-10 md:w-12 md:h-12"
                   viewBox="0 0 50 50"
                 >
                   <g>
-                    {/* White Circle */}
                     <rect width="50" height="50" rx="25" fill="#ffffff"></rect>
-                    {/* Double Arrow */}
                     <path
                       d="m19.25 19-6 6 6 6m11.5 0 6-6-6-6"
                       stroke="#000000"
@@ -150,21 +170,19 @@ export default function BagSlider() {
                   </g>
                 </svg>
 
-                {/* Subtle Border Effect */}
                 <div className="absolute inset-0 rounded-full border border-white/50 pointer-events-none"></div>
               </div>
             </div>
           </div>
 
           {/* LEFT PRODUCT INFO */}
-          <div className="absolute bottom-8 left-8 z-10 text-left">
+          <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-10 text-left">
             <h3
-              className="text-xl font-bold text-white mb-1"
+              className="text-base md:text-xl font-bold text-white mb-1"
               style={{ textShadow: "1px 1px 4px rgba(0,0,0,0.9)" }}
             >
               GREEN
             </h3>
-            {/* Animated Shop Now Button */}
             <button
               onClick={() => {
                 navigate(`/Detailpage/${"SHOULDER011"}`);
@@ -175,7 +193,7 @@ export default function BagSlider() {
               }}
               className="pb-1 relative group cursor-pointer overflow-hidden"
             >
-              <span className="relative z-10 text-black text-sm font-semibold transition-all duration-300 group-hover:text-gray-800">
+              <span className="relative z-10 text-black text-xs md:text-sm font-semibold transition-all duration-300 group-hover:text-gray-800">
                 Shop now
               </span>
               <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-700 ease-out group-hover:w-full"></div>
@@ -183,14 +201,13 @@ export default function BagSlider() {
           </div>
 
           {/* RIGHT PRODUCT INFO */}
-          <div className="absolute bottom-8 right-8 z-10 text-right">
+          <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-10 text-right">
             <h3
-              className="text-xl font-bold text-white mb-1"
+              className="text-base md:text-xl font-bold text-white mb-1"
               style={{ textShadow: "1px 1px 4px rgba(0,0,0,0.9)" }}
             >
               WINE
             </h3>
-            {/* Animated Shop Now Button */}
             <button
               onClick={() => {
                 navigate(`/Detailpage/${"SHOULDER015"}`);
@@ -201,7 +218,7 @@ export default function BagSlider() {
               }}
               className="pb-1 relative group cursor-pointer overflow-hidden"
             >
-              <span className="relative z-10 text-black text-sm font-semibold transition-all duration-300 group-hover:text-gray-800">
+              <span className="relative z-10 text-black text-xs md:text-sm font-semibold transition-all duration-300 group-hover:text-gray-800">
                 Shop now
               </span>
               <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-700 ease-out group-hover:w-full"></div>
