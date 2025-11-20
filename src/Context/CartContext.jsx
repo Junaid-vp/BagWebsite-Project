@@ -58,7 +58,15 @@ function CartProvider({ children }) {
   // ------------------------------------------------------------------------
   const addCart = async (product) => {
     if (!user) {
-      toast.error("Please login to add items");
+      toast.error("Please login to add items", {
+  position: "top-right",
+  autoClose: 1800,
+  hideProgressBar: true,
+  closeOnClick: true,
+  pauseOnHover: false,
+  draggable: false,
+  className: "premium-toast",
+});
       return;
     }
 

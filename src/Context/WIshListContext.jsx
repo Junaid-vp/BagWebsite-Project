@@ -33,7 +33,15 @@ export function WishListProvider({ children }) {
   // ------------------------------------------------------------------------
   const addWish = async (product) => {
     if (!user) {
-      toast.error("⚠️ Please login first");
+      toast.error("Please Login First", {
+  position: "top-right",
+  autoClose: 1800,
+  hideProgressBar: true,
+  closeOnClick: true,
+  pauseOnHover: false,
+  draggable: false,
+  className: "premium-toast",
+});
       return;
     }
 
