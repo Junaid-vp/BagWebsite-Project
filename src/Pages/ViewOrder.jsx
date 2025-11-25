@@ -73,112 +73,156 @@ function ViewOrder() {
   // 🎨 UI Rendering Section
   // ============================================================================
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white px-6 py-8">
+    <div className="min-h-screen bg-white p-6">
       <div className="max-w-4xl mx-auto">
 
         {/* ---------------------------------------------------------------
             HEADER SECTION — Title & Navigation Link
         --------------------------------------------------------------- */}
-        <div className="flex justify-between mb-8">
-          <h2 className="text-3xl font-semibold tracking-wide text-gray-800">
-            Your Orders
-          </h2>
+        <div className="border-b border-gray-300 pb-6 mb-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-3xl font-light tracking-wider text-black">
+              YOUR ORDERS
+            </h2>
 
-          {/* Navigate back home */}
-          <Link
-            to="/"
-            className="text-gray-600 hover:text-black transition-all duration-200 font-medium"
-          >
-            ← Home
-          </Link>
+            {/* Navigate back home */}
+            <Link
+              to="/"
+              className="text-gray-600 hover:text-black transition-all duration-200 font-light text-sm tracking-wide border border-gray-300 px-4 py-2 hover:border-black"
+            >
+              ← RETURN HOME
+            </Link>
+          </div>
         </div>
 
         {/* ---------------------------------------------------------------
-            EMPTY ORDER DISPLAY WHEN NO ORDERS FOUND
+            SCROLLABLE CONTENT AREA
         --------------------------------------------------------------- */}
-        {orders.length === 0 && (
-          <div className="p-10 rounded-2xl bg-white shadow-lg text-center text-gray-500 text-lg">
-            No orders yet.
-          </div>
-        )}
+        <div className="space-y-8 max-h-[75vh] overflow-y-auto pb-6">
 
-        {/* ---------------------------------------------------------------
-            ORDER LIST LOOP — iterate & show each order card
-        --------------------------------------------------------------- */}
-        {orders?.map((order) => (
-          <div
-            key={order.id}
-            className="rounded-2xl border border-gray-200 bg-white shadow-xl p-6 mb-10 transition-transform hover:-translate-y-1 duration-300"
-          >
-
-            {/* Order ID Title */}
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              Order <span className="text-gray-600">#{order.id}</span>
-            </h3>
-
-            {/* -----------------------------------------------------------
-                PRODUCT ITEMS INSIDE EACH ORDER
-            ----------------------------------------------------------- */}
-            <div className="space-y-4">
-              {order?.items?.map((item) => (
-                <div
-                  key={item.product_id}
-                  className="rounded-xl border border-gray-200 bg-gray-50 p-5 flex justify-between items-center backdrop-blur"
-                >
-                
-                  {/* -------------------------------
-                      LEFT SECTION — Product Info
-                  -------------------------------- */}
-                  <div>
-                    <p className="text-lg font-medium text-gray-800">
-                      {item.name}
-                    </p>
-
-                    {/* Product Image */}
-                    <img
-                      src={item.image_url}
-                      alt={item.name}
-                      className="w-15 h-15 rounded-lg object-cover border"
-                    />
-
-                    <p className="text-sm text-gray-500">Free Delivery Included</p>
-
-                    {/* Status Display */}
-                    <p className="mt-1 text-sm">
-                      Status:{" "}
-                      <span
-                        className={
-                          item.status === "Cancelled"
-                            ? "text-red-600 font-semibold"
-                            : "text-amber-600 font-semibold"
-                        }
-                      >
-                        {item.status || "Pending"}
-                      </span>
-                    </p>
-                  </div>
-
-                  {/* -------------------------------
-                      RIGHT SECTION — Cancel Button
-                  -------------------------------- */}
-                  <button
-                    disabled={
-                      item.status === "Cancelled" ||
-                      item.status === "Delivered" ||
-                      item.status === "Shipped"
-                    }
-                    onClick={() => cancelSingleProduct(order.id, item.product_id)}
-                    className="px-5 py-2 rounded-full text-sm font-medium transition
-                      bg-black text-white hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    {item.status === "Cancelled" ? "Cancelled" : "Cancel"}
-                  </button>
-
-                </div>
-              ))}
+          {/* ---------------------------------------------------------------
+              EMPTY ORDER DISPLAY WHEN NO ORDERS FOUND
+          --------------------------------------------------------------- */}
+          {orders.length === 0 && (
+            <div className="border border-gray-300 p-12 text-center">
+              <p className="text-gray-500 font-light tracking-wide text-lg mb-2">
+                NO ORDERS YET
+              </p>
+              <p className="text-gray-400 text-sm font-light">
+                Your order history will appear here
+              </p>
             </div>
-          </div>
-        ))}
+          )}
+
+          {/* ---------------------------------------------------------------
+              ORDER LIST LOOP — iterate & show each order card
+          --------------------------------------------------------------- */}
+          {orders?.map((order) => (
+            <div
+              key={order.id}
+              className="border border-gray-300 p-8"
+            >
+
+              {/* Order ID Title */}
+              <div className="border-b border-gray-300 pb-4 mb-6">
+                <h3 className="text-xl font-light tracking-wider text-black uppercase">
+                  Order #{order.id}
+                </h3>
+                <p className="text-gray-500 text-sm font-light mt-1">
+                  Placed on {new Date().toLocaleDateString()}
+                </p>
+              </div>
+
+              {/* -----------------------------------------------------------
+                  PRODUCT ITEMS INSIDE EACH ORDER
+              ----------------------------------------------------------- */}
+              <div className="space-y-6">
+                {order?.items?.map((item) => (
+                  <div
+                    key={item.product_id}
+                    className="border border-gray-200 p-6 flex gap-6 items-start hover:border-gray-400 transition-all duration-300"
+                  >
+                  
+                    {/* -------------------------------
+                        PRODUCT IMAGE SECTION
+                    -------------------------------- */}
+                    <div className="flex-shrink-0">
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        className="w-24 h-24 object-cover border border-gray-200"
+                      />
+                    </div>
+
+                    {/* -------------------------------
+                        PRODUCT DETAILS SECTION
+                    -------------------------------- */}
+                    <div className="flex-1 space-y-3">
+                      <p className="text-lg font-light text-black tracking-wide">
+                        {item.name}
+                      </p>
+
+                      <div className="flex items-center gap-6 text-sm">
+                        <div>
+                          <span className="font-light text-gray-600">QUANTITY: </span>
+                          <span className="text-black font-light">1</span>
+                        </div>
+                       
+                      </div>
+
+                      {/* Status Display */}
+                      <div className="flex items-center gap-4">
+                        <span className="font-light text-gray-600 text-sm">STATUS:</span>
+                        <span
+                          className={
+                            item.status === "Cancelled"
+                              ? "text-red-600 font-light text-sm tracking-wide"
+                              : item.status === "Delivered"
+                              ? "text-green-600 font-light text-sm tracking-wide"
+                              : item.status === "Shipped"
+                              ? "text-blue-600 font-light text-sm tracking-wide"
+                              : "text-black font-light text-sm tracking-wide"
+                          }
+                        >
+                          {item.status || "PENDING"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* -------------------------------
+                        ACTION BUTTON SECTION
+                    -------------------------------- */}
+                    <div className="flex-shrink-0">
+                      <button
+                        disabled={
+                          item.status === "Cancelled" ||
+                          item.status === "Delivered" ||
+                          item.status === "Shipped"
+                        }
+                        onClick={() => cancelSingleProduct(order.id, item.product_id)}
+                        className="px-6 py-3 text-sm font-light tracking-wide transition border border-black text-black hover:bg-black hover:text-white disabled:border-gray-300 disabled:text-gray-300 disabled:cursor-not-allowed min-w-[120px]"
+                      >
+                        {item.status === "Cancelled" ? "CANCELLED" : 
+                         item.status === "Delivered" ? "DELIVERED" :
+                         item.status === "Shipped" ? "SHIPPED" : "CANCEL ITEM"}
+                      </button>
+                    </div>
+
+                  </div>
+                ))}
+              </div>
+
+              {/* Order Footer */}
+              <div className="border-t border-gray-300 pt-4 mt-6 flex justify-between items-center text-sm">
+                <span className="text-gray-600 font-light">
+                  {order.items?.length} ITEM{order.items?.length > 1 ? 'S' : ''}
+                </span>
+               
+              </div>
+
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

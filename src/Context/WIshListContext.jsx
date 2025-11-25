@@ -79,6 +79,7 @@ export function WishListProvider({ children }) {
 
     try {
       await api.patch(`/users/${user.id}`, { wishList: updated });
+
       toast.success(
         <div className="toast-content">
           <span className="toast-title">{product.name}</span>

@@ -8,85 +8,159 @@ function Profile() {
   const navigate = useNavigate();
   const { user, Logout } = useContext(AuthContext);
 
+  const handleLogout = async () => {
+    try {
+      await Logout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const formatAddress = (address) => {
+    if (!address || address.length === 0) return null;
+    
+    const primaryAddress = address[0];
+    return {
+      name: primaryAddress.name || "Not provided",
+      number: primaryAddress.number || "Not provided",
+      pinCode: primaryAddress.pinCode || "Not provided",
+      locality: primaryAddress.locality || "Not provided",
+      address: primaryAddress.address || "Not provided",
+      city: primaryAddress.city || "Not provided",
+      state: primaryAddress.state || "Not provided"
+    };
+  };
+
+  const formattedAddress = formatAddress(user?.address);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4" data-aos="fade-up"
-     data-aos-duration="1000"  >
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-8 space-y-6">
-        <h2 className="text-3xl font-semibold text-gray-800 text-center mb-6">
-          Your Account
-        </h2>
+    <div 
+      className="min-h-screen flex items-start justify-center bg-white p-4 py-6"
+      data-aos="fade-up"
+      data-aos-duration="1000"
+    >
+      <div className="w-full max-w-2xl bg-white border border-gray-200">
+        {/* Header Section - Minimal */}
+        <div className="border-b border-gray-200 p-6 text-center">
+          <h2 className="text-2xl font-light tracking-wide text-black mb-2">
+            Your Account
+          </h2>
+          <p className="text-gray-600 font-light text-sm">
+            Welcome back, {user?.FirstName}
+          </p>
+        </div>
 
-        {/* Orders Link */}
-        <div className="text-center mb-6">
-          <Link
-            to="/vieworder/:orderI"
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 border border-gray-800 transition-all duration-300 font-medium"
+        {/* Scrollable Content */}
+        <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+          {/* Quick Actions - Minimal */}
+          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+            <Link
+              to="/vieworder/:orderId"
+              className="px-6 py-2 bg-white text-black border border-black hover:bg-black hover:text-white transition-all duration-300 font-light text-center text-xs tracking-wide flex-1"
+            >
+              VIEW ORDERS
+            </Link>
+            <Link
+              to="/cart"
+              className="px-6 py-2 bg-black text-white border border-black hover:bg-white hover:text-black transition-all duration-300 font-light text-center text-xs tracking-wide flex-1"
+            >
+              CART ({cartLength || 0})
+            </Link>
+          </div>
 
+          {/* Two Column Layout: Account & Address */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Account Details Card */}
+            <div className="border border-gray-200 p-4 bg-white">
+              <h3 className="text-sm font-light tracking-wider text-black mb-4 uppercase border-b border-gray-200 pb-2">
+                Account
+              </h3>
+              
+              <div className="space-y-3 text-xs">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="font-light text-gray-600 tracking-wide">NAME</span>
+                  <span className="text-black font-light text-right">
+                    {user?.FirstName} {user?.LastName}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="font-light text-gray-600 tracking-wide">EMAIL</span>
+                  <span className="text-black font-light text-right">{user?.Email}</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="font-light text-gray-600 tracking-wide">CART</span>
+                  <span className={`font-light ${cartLength > 0 ? 'text-black' : 'text-gray-500'}`}>
+                    {cartLength > 0 ? `${cartLength}` : "EMPTY"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Address Details Card */}
+            <div className="border border-gray-200 p-4 bg-white">
+              <h3 className="text-sm font-light tracking-wider text-black mb-4 uppercase border-b border-gray-200 pb-2">
+                Address
+              </h3>
+
+              <div className="space-y-3 text-xs">
+                {formattedAddress ? (
+                  <div className="space-y-2">
+                    <div className="flex justify-between py-1 border-b border-gray-100">
+                      <span className="font-light text-gray-600 tracking-wide">NAME</span>
+                      <span className="text-black font-light text-right">{formattedAddress.name}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-100">
+                      <span className="font-light text-gray-600 tracking-wide">PHONE</span>
+                      <span className="text-black font-light text-right">{formattedAddress.number}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-100">
+                      <span className="font-light text-gray-600 tracking-wide">PINCODE</span>
+                      <span className="text-black font-light text-right">{formattedAddress.pinCode}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-100">
+                      <span className="font-light text-gray-600 tracking-wide">LOCALITY</span>
+                      <span className="text-black font-light text-right">{formattedAddress.locality}</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-gray-100">
+                      <span className="font-light text-gray-600 tracking-wide">CITY</span>
+                      <span className="text-black font-light text-right">{formattedAddress.city}</span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="font-light text-gray-600 tracking-wide">STATE</span>
+                      <span className="text-black font-light text-right">{formattedAddress.state}</span>
+                    </div>
+                    <div className="mt-3 pt-2 border-t border-gray-200">
+                      <span className="font-light text-gray-600 tracking-wide block mb-1 text-xs">ADDRESS</span>
+                      <p className="text-black font-light text-xs leading-relaxed">
+                        {formattedAddress.address}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-gray-500 font-light tracking-wide text-xs">
+                      NO ADDRESS SAVED
+                    </p>
+                    <p className="text-gray-400 text-xs mt-1 font-light">
+                      Add during checkout
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Fixed Logout Button at Bottom */}
+        <div className="border-t border-gray-200 p-4 bg-white sticky bottom-0">
+          <button
+            onClick={handleLogout}
+            className="w-full py-3 bg-white text-black border border-black hover:bg-black hover:text-white transition-all duration-300 font-light tracking-wider text-xs uppercase"
           >
-            View Your Orders
-          </Link>
+            LOGOUT
+          </button>
         </div>
-
-        {/* Two Column Layout: Account & Address */}
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Account Details */}
-          <div className="flex-1 border rounded-xl p-6 bg-gray-50 shadow-inner">
-            <h3 className="text-xl font-medium text-gray-800 mb-4">
-              Account Details
-            </h3>
-            <div className="space-y-3 text-gray-700">
-              <p>
-                <span className="font-semibold">Name:</span>{" "}
-                <span className="font-light">
-                  {user?.FirstName} {user?.LastName}
-                </span>
-              </p>
-              <p>
-                <span className="font-semibold">Email:</span>{" "}
-                <span className="font-light">{user?.Email}</span>
-              </p>
-              <p>
-                <span className="font-semibold">Cart:</span>{" "}
-                <span className="font-light">
-                  {user?.cart?.length >= 1 ? `${cartLength} Items` : "Empty"}
-                </span>
-              </p>
-            </div>
-          </div>
-
-          {/* Address Details */}
-          <div className="flex-1 border rounded-xl p-6 bg-gray-50 shadow-inner">
-            <h3 className="text-xl font-medium text-gray-800 mb-4">
-              Address Details
-            </h3>
-            <div className="space-y-3 text-gray-700">
-            {user?.address?.length > 0 ? (
-  <p className="font-light">
-    Name: {user?.address[0].name} <br />
-    Number: {user?.address[0].number} <br />
-    Pincode: {user?.address[0].pinCode} <br />
-    Locality: {user?.address[0].locality} <br />
-    Address: {user?.address[0].address} <br />
-    City: {user?.address[0].city} <br />
-    State: {user?.address[0].state}
-  </p>
-) : (
-  <p className="font-light">
-    Currently no address. You can save your address when you buy a product.
-  </p>
-)}
-
-            </div>
-          </div>
-        </div>
-
-        {/* Logout Button */}
-        <button
-          onClick={Logout}
-          className="mt-6 w-full py-3 bg-black text-white rounded-full hover:bg-gray-900 transition-colors duration-300 font-medium"
-        >
-          Logout
-        </button>
       </div>
     </div>
   );
