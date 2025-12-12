@@ -45,7 +45,7 @@ function SecondSlider() {
   const leftSlides = [
     {
       id: "MICRO001",
-      src: "https://miraggiolife.com/cdn/shop/files/1_3_1d1d6381-3ca3-4123-b20b-15d3ee4fc2b8.jpg?v=1760686682&width=900",
+      src: "https://miraggiolife.com/cdn/shop/files/IN_THE_SPOTLIGHT-1.jpg?v=1764420408&width=900",
       alt: "Colorful Micros"
     },
     {

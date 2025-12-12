@@ -15,7 +15,7 @@ const categories = [
     title: "EVERY DAY",
     route: "/MainTote",
     image:
-      "https://miraggiolife.com/cdn/shop/files/3-Minimal.jpg?v=1760685969&width=400",
+      "https://miraggiolife.com/cdn/shop/files/Everyday_f45d6c96-003d-4220-a842-6547ce6bbfcc.jpg?v=1764764845&width=400",
     alt: "Everyday Tote Bags",
     aos: "fade-up",
     duration: 450,
@@ -25,7 +25,7 @@ const categories = [
     title: "AFTER HOURS",
     route: "/MainShoulder",
     image:
-      "https://miraggiolife.com/cdn/shop/files/4-After-hours.jpg?v=1760685969&width=400",
+      "https://miraggiolife.com/cdn/shop/files/Work_06259620-8cad-4d0f-86c9-50cf5d7f34cd.jpg?v=1764572367&width=400",
     alt: "Party & Evening Bags",
     aos: "fade-down",
     duration: 450,
@@ -35,7 +35,7 @@ const categories = [
     title: "WORK",
     route: "/MainTopHandle",
     image:
-      "https://miraggiolife.com/cdn/shop/files/2-Work.jpg?v=1760685969&width=400",
+      "https://miraggiolife.com/cdn/shop/files/Tweed_2.jpg?v=1765454713&width=400",
     alt: "Office & Work Bags",
     aos: "fade-up",
     duration: 450,

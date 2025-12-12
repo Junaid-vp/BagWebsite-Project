@@ -3,6 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./SliderCompoment.css"
+import {Link} from 'react-router-dom'
 function SliderComponent() {
   const settings = {
     dots: false,
@@ -23,20 +24,26 @@ function SliderComponent() {
         <Slider {...settings}>
           {/* Slide 1 */}
           <div>
-            <img
-              src="https://miraggiolife.com/cdn/shop/files/1-Colourful-micro_1.jpg?v=1760685694&width=2600"
+            <Link to="MainAllbag">
+             <img
+              src="https://miraggiolife.com/cdn/shop/files/Tweed_Home_page.jpg?v=1764420211&width=2600"
               alt="Colorful Micros"
               className="w-full h-[250px] sm:h-[300px] md:h-[400px] lg:h-[450px] object-cover"
             />
+            </Link>
+           
           </div>
 
           {/* Slide 2 */}
           <div>
+            <Link to="MainAllbag">
             <img
-              src="https://miraggiolife.com/cdn/shop/files/2-Minimalist.jpg?v=1760685694&width=2600"
+              src="https://miraggiolife.com/cdn/shop/files/Desktop_1_042a52c5-d4d4-4405-8dc8-a303040f0b85.jpg?v=1765196353&width=2600"
               alt="Minimalist Bags"
                className="w-full h-[250px] sm:h-[300px] md:h-[400px] lg:h-[450px] object-cover"
             />
+            </Link>
+            
           </div>
         </Slider>
       </div>
